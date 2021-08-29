@@ -11,8 +11,6 @@
 #include "server_files/client_handler.h"
 #include <signal.h>
 
-
-
 void main()
 {
 
@@ -20,6 +18,8 @@ void main()
     int server_sockfd, server_addrlen, client_addrlen, client_sockfd;
     struct sockaddr_in server_addr, client_addr;
     ClientList *client;
+    char msg[101];
+    FILE *fp;
 
     server_addrlen = sizeof(server_addrlen);
     client_addrlen = sizeof(client_addrlen);
@@ -44,6 +44,14 @@ void main()
     head = addNode(server_sockfd, inet_ntoa(server_addr.sin_addr));
     curr = head;
 
+    //creating user_info data file if doesn't exists
+    fp = fopen("server_files/user_info.dat", "rb");
+    if (fp == NULL)
+    {
+        fp = fopen("server_files/user_info.dat","wb");
+    }
+    fclose(fp);
+
     //handling connections
     while (1)
     {
@@ -58,7 +66,6 @@ void main()
         client->prev = (ClientList *)curr;
         curr->next = client;
         curr = client;
-
 
         //assingning a thread to the client
         pthread_t t_id;
