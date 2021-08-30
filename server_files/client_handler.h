@@ -73,7 +73,8 @@ void makeAdmin(ClientList *client, char username[])
                 sendAll(tmp, msg);
                 while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
                 {
-                    if (strcmp(user_info.username, tmp->name) == 0)
+
+                    if (strcasecmp(user_info.username, tmp->name) == 0)
                     {
                         curr_pos = ftell(fp);
                         fseek(fp, curr_pos - sizeof(user_info), SEEK_SET);
@@ -118,9 +119,9 @@ void sendAll(ClientList *client, char *msg)
 void online(ClientList *client)
 {
     char msg[201];
-    memset(msg, 0, sizeof(msg));
     int i, count = 1;
     ClientList *tmp = (ClientList *)head->next;
+    memset(msg, 0, sizeof(msg));
     msg[0] = '\r';
     while (tmp != NULL)
     {
@@ -174,7 +175,7 @@ void kick(ClientList *client, char username[])
         }
         else
         {
-            sprintf(msg, "[\033[0;36m%s have been kicked by %s\033[0m]", username, client->name);
+            sprintf(msg, "[\033[0;36m%s has been kicked by %s\033[0m]", username, client->name);
             sendAll(tmp, msg);
         }
     }
@@ -199,11 +200,12 @@ void whispered(ClientList *client, char username[], char msg[])
     {
         if (strcasecmp(tmp->name, username) == 0)
         {
-            sprintf(whisper, "|%s whispered you: %s|", client->name, msg);
+            sprintf(whisper, "|!|%s whispered you: %s|!|", client->name, msg);
             send(tmp->socket, whisper, sizeof(whisper), 0);
             found = 1;
             break;
         }
+        tmp = tmp->next;
     }
     if (found == 0)
     {
@@ -219,14 +221,9 @@ void *c_handler(void *client_t)
     char password[20] = {};
     char recv_msg[101] = {};
     char send_msg[201] = {};
-    int data, command_flag = 0;
-    char *user, *pass, *user_name, *whisp;
-    char kicks[36];
-    char admin[36];
-    char whisper[36];
-    char loginOrRegister[101];
-    char *logOrReg;
-    int found = 0;
+    int data, command_flag = 0, found = 0;
+    char *user, *pass, *user_name, *whisp, *logOrReg;
+    char kicks[36], admin[36], whisper[36], loginOrRegister[101];
     FILE *fp;
 
     // char opt[4]; // check the option
@@ -244,7 +241,7 @@ void *c_handler(void *client_t)
 
         while (fread(&user_info, sizeof(user_info), 1, fp) == 1)
         {
-            
+
             if ((strcasecmp(user_info.username, user) == 0) && (strcmp(user_info.password, pass) == 0))
             {
                 found = 1;
@@ -360,12 +357,19 @@ void *c_handler(void *client_t)
             else if (strcmp(user_name = strtok(whisper, " "), "/whisper") == 0)
             {
                 command_flag = 1;
+                user_name = strtok(NULL, " ");
                 if (user_name != NULL)
                 {
-                    user_name = strtok(NULL, " ");
                     whisp = strtok(NULL, "\n");
                     whispered(client, user_name, whisp);
                 }
+            }
+            else if (strcmp(recv_msg, "/rickroll") == 0)
+            {
+                command_flag = 1;
+                // sprintf(send_msg,"\033[42;1m !!!%s RickRolled You: NEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!! \033[0m",client->name);
+                sprintf(send_msg," !!!\033[0m\033[33;1m%s RickRolled You: \033[0m\033[42;1mNEVER GONNA GIVE YOU UP! NEVER GONNA LET YOU DOWN!!!\033[0m ",client->name);
+                sendAll(client,send_msg);
             }
             else
                 sprintf(send_msg, "\033[0m\033[41;1m%s:\033[0m\033[44;1m %s\033[0m", client->name, recv_msg);
@@ -393,9 +397,9 @@ void *c_handler(void *client_t)
 
     // if leaves, truncate the client from the list
 
-    strcpy(send_msg,"Connection Closed!");
-    printf("\tConnection Closed with %s\n",client->ip);
-    send(client->socket,send_msg,sizeof(send_msg),0);
+    strcpy(send_msg, "Connection Closed!");
+    printf("\tConnection Closed with %s\n", client->ip);
+    send(client->socket, send_msg, sizeof(send_msg), 0);
     close(client->socket);
     if (client == curr)
     {

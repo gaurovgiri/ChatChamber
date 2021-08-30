@@ -11,21 +11,28 @@ typedef struct DATA
 void command(info *data) //commands are written here
 {
 
-    char *user_name,*whisp;
-    char kick[36];
-    char admin[36];
-    char whisper[201];
+    char *user_name, *whisp;
+    char kick[36], admin[36], whisper[201];
 
     strcpy(kick, data->message);
     strcpy(admin, data->message);
-    strcpy(whisper,data->message);
+    memset(whisper,0,sizeof(whisper));
+    strcpy(whisper, data->message);
 
     if (strcmp(data->message, "/help") == 0)
     {
         printf("Command List:\n");
-        printf("/whoami -> Displays your name");
-        printf("/clear -> To clear screen");
-        printf("/dev -> To display creators' names");
+        printf("/whoami -> Displays your name\n");
+        printf("/clear -> To clear screen\n");
+        printf("/dev -> To display creators' names\n");
+        printf("/role -> To display user's role\n");
+        printf("/online -> To display online users\n");
+        printf("/admin -> To make admin. Syntax: /admin <username>\n");
+        printf("/kick -> To kick user from the server. Syntax: /kick <username>\n");
+        printf("/whisper -> To send private message to a user. Syntax: /whisper <username> <message>\n");
+
+
+
     }
 
     else if (strcmp(data->message, "/whoami") == 0)
@@ -34,7 +41,6 @@ void command(info *data) //commands are written here
     }
     else if (strcmp(data->message, "/rickroll") == 0)
     {
-        sprintf(data->message, "\r%s RickRolled You: Never Gonna Give you Up.", data->name);
         send(data->sockfd, data->message, sizeof(data->message), 0);
     }
     else if (strcmp(data->message, "/clear") == 0)
@@ -82,18 +88,17 @@ void command(info *data) //commands are written here
     else if (strcmp(user_name = strtok(whisper, " "), "/whisper") == 0) // fix the multi words whisper
     {
         user_name = strtok(NULL, " ");
-        whisp = strtok(NULL,"\0");
+        whisp = strtok(NULL, "\n");
         if (user_name == NULL || whisp == NULL)
         {
             printf("\rPlease specify the user name. Syntax : /whisper <username> <msg>\n");
         }
         else
         {
-            
+
             send(data->sockfd, data->message, sizeof(data->message), 0);
         }
     }
-
 
     else
     {

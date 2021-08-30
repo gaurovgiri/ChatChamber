@@ -13,13 +13,13 @@
 
 void main()
 {
-
-    signal(SIGINT, catch_ctrl_c_and_exit);
     int server_sockfd, server_addrlen, client_addrlen, client_sockfd;
     struct sockaddr_in server_addr, client_addr;
     ClientList *client;
     char msg[101];
     FILE *fp;
+    
+    signal(SIGINT, catch_ctrl_c_and_exit);
 
     server_addrlen = sizeof(server_addrlen);
     client_addrlen = sizeof(client_addrlen);
@@ -48,7 +48,7 @@ void main()
     fp = fopen("server_files/user_info.dat", "rb");
     if (fp == NULL)
     {
-        fp = fopen("server_files/user_info.dat","wb");
+        fp = fopen("server_files/user_info.dat", "wb");
     }
     fclose(fp);
 

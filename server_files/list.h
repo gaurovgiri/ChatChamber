@@ -9,7 +9,7 @@ typedef struct Nodes
     char ip[16];
     char name[31];
     char role[10];
-    int leave_flag; //admin->1,member->1
+    int leave_flag;
 } ClientList;
 
 ClientList *addNode(int sockfd, char *ip)
